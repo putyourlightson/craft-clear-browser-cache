@@ -4,6 +4,12 @@ This module clears the local browser cache once per unique visitor. It does so b
 
 To learn the reason for its existence, [read this article →](https://putyourlightson.com/articles/critical-update-for-a-blitz-blunder)
 
+## Requirements
+
+This plugin requires [Craft CMS](https://craftcms.com/) 4.0.0 or later, or 5.0.0 or later.
+
+## Installation
+
 Install this module via composer.
 
 ```shell
@@ -11,6 +17,8 @@ composer require putyourlightson/craft-clear-browser-cache
 ```
 
 Once installed, the module self-bootstraps and does not require any further setup.
+
+## Configuration
 
 The module is configured to run only until a cut-off date, which is set to `2026-01-01` by default. After that date, the module will have no effect. This value can be overridden by setting a `CLEAR_BROWSER_CACHE_CUTOFF_DATE` environment variable in your `.env` file.
 
