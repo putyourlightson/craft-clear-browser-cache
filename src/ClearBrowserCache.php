@@ -29,40 +29,42 @@ class ClearBrowserCache extends Module implements BootstrapInterface
     {
         Craft::$app->setModule(self::ID, $this);
 
-        if (Craft::$app->getRequest()->getIsSiteRequest()) {
-            $expireTime = $this->getExpireTime();
-            if ($expireTime > 0) {
-                Event::on(
-                    Response::class,
-                    Response::EVENT_AFTER_PREPARE,
-                    [$this, 'handleResponse'],
-                );
-            }
+        if (!Craft::$app->getRequest()->getIsSiteRequest()) {
+            return;
         }
-    }
 
-    private function getExpireTime(): int
-    {
-        $cutoffDate = App::env('CLEAR_BROWSER_CACHE_CUTOFF_DATE') ?? self::DEFAULT_CUTOFF_DATE;
-        $expireTime = strtotime($cutoffDate) - time();
+        if ($this->getCutoffTime() - time() < 0) {
+            return;
+        }
 
-        return max($expireTime, 0);
-    }
-
-    private function handleResponse(Event $event): void
-    {
         $cookie = Craft::$app->getRequest()->getCookies()->get('BrowserCacheCleared');
         if ($cookie !== null) {
             return;
         }
 
+        Event::on(
+            Response::class,
+            Response::EVENT_AFTER_PREPARE,
+            [$this, 'handleResponse'],
+        );
+    }
+
+    public function handleResponse(Event $event): void
+    {
         /** @var Response $response */
         $response = $event->sender;
         $response->getHeaders()->set('Clear-Site-Data', '"cache"');
         $response->getCookies()->add(new Cookie([
             'name' => 'BrowserCacheCleared',
             'value' => 1,
-            'expire' => $this->getExpireTime(),
+            'expire' => $this->getCutoffTime(),
         ]));
+    }
+
+    private function getCutoffTime(): int
+    {
+        $cutoffDate = App::env('CLEAR_BROWSER_CACHE_CUTOFF_DATE') ?? self::DEFAULT_CUTOFF_DATE;
+
+        return strtotime($cutoffDate);
     }
 }
