@@ -10,8 +10,7 @@
   },
   "require-dev": {
     "craftcms/ecs": "dev-main",
-    "craftcms/phpstan": "dev-main",
-    "putyourlightson/craft-blitz": "^5.0"
+    "craftcms/phpstan": "dev-main"
   },
   "autoload": {
     "psr-4": {
